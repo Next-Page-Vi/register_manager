@@ -1,0 +1,17 @@
+.git
+.github
+.impeccable
+docs
+bin
+dist
+data
+deploy/.env
+**/*.db
+**/*.db-wal
+**/*.db-shm
+**/*.bak
+web/node_modules
+web/dist
+web/e2e/.tmp
+web/test-results
+web/playwright-report

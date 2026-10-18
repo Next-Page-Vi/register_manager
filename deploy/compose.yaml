@@ -1,11 +1,14 @@
-# Example single-node deployment. Put a TLS-terminating reverse proxy
-# (Caddy, nginx, Traefik, ...) in front of port 8080.
+# 在宿主机配置 HTTPS 反向代理，转发到 127.0.0.1:8080。
+# Configure an HTTPS reverse proxy on the host, forwarding to 127.0.0.1:8080.
 #
-#   docker compose -f deploy/compose.yaml up -d
-#   docker compose -f deploy/compose.yaml logs app   # the super admin's first password
+# 在 deploy/ 中运行；可选用 .env 中的 RM_IMAGE 覆盖默认镜像：
+# Run from deploy/; optionally override the image with RM_IMAGE in .env:
+#   docker compose pull
+#   docker compose up -d
+#   docker compose logs app   # 初始管理员密码 / Initial admin password
 services:
   app:
-    build: ..
+    image: ${RM_IMAGE:-ghcr.io/next-page-vi/register_manager:latest}
     restart: unless-stopped
     ports:
       - "127.0.0.1:8080:8080"

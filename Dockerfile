@@ -16,10 +16,18 @@ RUN go mod download
 COPY . .
 COPY --from=web /src/web/dist ./web/dist
 RUN go build -trimpath -ldflags="-s -w" -o /out/server ./cmd/server
+RUN go run github.com/google/go-licenses/v2@v2.0.1 save ./cmd/server \
+      --ignore register_manager --save_path=/out/licenses/go \
+    && cp /usr/local/go/LICENSE /out/licenses/go/LICENSE-go
 
 FROM alpine:3.22
 RUN adduser -D -u 10001 app && mkdir /data && chown app /data
 COPY --from=server /out/server /usr/local/bin/server
+COPY LICENSE THIRD_PARTY_NOTICES.md /usr/share/licenses/register_manager/
+COPY --from=server /out/licenses/go /usr/share/licenses/register_manager/go/
+COPY --from=web /src/web/dist/THIRD_PARTY_LICENSES.md /usr/share/licenses/register_manager/frontend.md
+LABEL org.opencontainers.image.source="https://github.com/Next-Page-Vi/register_manager" \
+      org.opencontainers.image.licenses="MIT"
 USER app
 ENV RM_DB_PATH=/data/register_manager.db \
     RM_LISTEN=:8080 \

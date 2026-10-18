@@ -1,9 +1,13 @@
-# Build output
+# Dependencies and build output
+node_modules/
 /bin/
 /dist/
 web/dist/*
 !web/dist/.gitkeep
-web/node_modules/
+*.tsbuildinfo
+
+# Test artifacts
+coverage/
 web/e2e/.tmp/
 web/test-results/
 web/playwright-report/
@@ -12,8 +16,14 @@ web/playwright-report/
 /docs/
 /.impeccable/
 
-# Local data
+# Local configuration (keep the deployment template)
+.env
+.env.*
+!.env.example
+
+# Local data and logs
 /data/
+*.log
 *.db
 *.db-wal
 *.db-shm

@@ -33,6 +33,7 @@ export default defineConfig({
     },
   },
   build: {
+    license: { fileName: 'THIRD_PARTY_LICENSES.md' },
     // Vite 8's default modern target; matches the documented browser
     // baseline (Chrome/Edge 111, Firefox 128, Safari 16.4).
     outDir: 'dist',

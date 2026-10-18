@@ -1,0 +1,44 @@
+# 在宿主机的 http 块内加载；替换域名和证书路径。
+# Include inside the host's http block; replace the domain and certificate paths.
+# 直接面向客户端；前置 CDN/代理需要另行配置可信客户端地址。
+# Face clients directly; a CDN/proxy in front needs separate trusted-IP configuration.
+
+# 不记录查询参数、Referer、Cookie 或请求正文。
+# Omit query parameters, Referer, cookies, and request bodies.
+log_format register_manager '$remote_addr [$time_local] "$request_method $uri" $status';
+
+server {
+    listen 80;
+    server_name booking.example.com;
+    access_log /var/log/nginx/register_manager.access.log register_manager;
+    # HTTP 重定向也可能携带凭证，禁止错误日志记录完整 URL。
+    # HTTP redirects may carry credentials too; keep full URLs out of error logs.
+    error_log /dev/null;
+    return 308 https://booking.example.com$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name booking.example.com;
+    ssl_certificate /etc/letsencrypt/live/booking.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/booking.example.com/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+
+    access_log /var/log/nginx/register_manager.access.log register_manager;
+    error_log /var/log/nginx/register_manager.error.log warn;
+
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    # 个人登录链接和注册入口可能包含凭证；访问日志仍记录安全路径和状态码。
+    # Personal links and registration can contain credentials; access logs retain safe paths and status codes.
+    location ~ ^/i/[^/]+/(access|register)(/|$) {
+        error_log /dev/null;
+        proxy_pass http://127.0.0.1:8080;
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+    }
+}
