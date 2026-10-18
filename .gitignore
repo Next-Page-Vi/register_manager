@@ -1,0 +1,26 @@
+# Build output
+/bin/
+/dist/
+web/dist/*
+!web/dist/.gitkeep
+web/node_modules/
+web/e2e/.tmp/
+web/test-results/
+web/playwright-report/
+
+# Local documentation and design review artifacts
+/docs/
+/.impeccable/
+
+# Local data
+/data/
+*.db
+*.db-wal
+*.db-shm
+*.bak
+
+# Editors and OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

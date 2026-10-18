@@ -1,0 +1,282 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+/* Dark mode follows the system setting; there is no in-app toggle. */
+@custom-variant dark (@media (prefers-color-scheme: dark));
+
+/*
+ * Staff use the browser's default 16px scale. Customer surfaces restore
+ * the senior-friendly 18px scale, including in portalled overlays.
+ * Text is at least 4.5:1 against its background (body text 7:1)
+ * and control borders (--input) at least 3:1, in light and dark; --border is
+ * for decorative lines only.
+ *
+ * Fonts come from the system; no web fonts are downloaded. Chinese and
+ * Japanese share characters but draw many of them differently, so each
+ * language starts with its own region's fonts (see :lang() below); Latin
+ * text and digits on those pages use the same font. A single list with
+ * Japanese fonts first made Chinese appear in Japanese shapes on Apple
+ * devices, and a leading system-ui is the system language's font (Microsoft
+ * YaHei UI on Chinese Windows), so system-ui only comes after named fonts.
+ */
+:root {
+  font-size: 100%;
+  --control-height: 2.75rem;
+  --control-small: 2.5rem;
+  --control-large: 3.5rem;
+  --page-gap: 1.25rem;
+  --form-gap: 1rem;
+  --card-gap: 1rem;
+  --card-padding-inline: 1rem;
+  --card-padding-block: 1.25rem;
+  --dialog-width: 35rem;
+  --font-latin: -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, system-ui;
+  color-scheme: light dark;
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --canvas: oklch(0.98 0.004 262);
+  --foreground: oklch(0.18 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0 0);
+  --primary: oklch(0.45 0.2 262);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.95 0.01 262);
+  --secondary-foreground: oklch(0.22 0.02 262);
+  --muted: oklch(0.96 0 0);
+  --muted-foreground: oklch(0.42 0 0);
+  --accent: oklch(0.95 0.02 262);
+  --accent-foreground: oklch(0.22 0.02 262);
+  --destructive: oklch(0.5 0.2 27);
+  --destructive-foreground: oklch(0.99 0 0);
+  --success: oklch(0.45 0.13 150);
+  --success-foreground: oklch(0.99 0 0);
+  --warning: oklch(0.55 0.13 70);
+  --border: oklch(0.88 0 0);
+  --input: oklch(0.55 0 0);
+  --ring: oklch(0.45 0.2 262);
+  --chart-booked: oklch(0.45 0.2 262);
+  --chart-completed: oklch(0.45 0.13 150);
+  --chart-cancelled: oklch(0.52 0.02 262);
+  --chart-no-show: oklch(0.53 0.17 45);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: oklch(0.17 0.005 262);
+    --canvas: oklch(0.15 0.006 262);
+    --foreground: oklch(0.96 0 0);
+    --card: oklch(0.21 0.008 262);
+    --card-foreground: oklch(0.96 0 0);
+    --popover: oklch(0.21 0.008 262);
+    --popover-foreground: oklch(0.96 0 0);
+    --primary: oklch(0.74 0.13 262);
+    --primary-foreground: oklch(0.17 0.02 262);
+    --secondary: oklch(0.28 0.03 262);
+    --secondary-foreground: oklch(0.95 0.01 262);
+    --muted: oklch(0.25 0.008 262);
+    --muted-foreground: oklch(0.78 0 0);
+    --accent: oklch(0.3 0.04 262);
+    --accent-foreground: oklch(0.97 0.01 262);
+    --destructive: oklch(0.72 0.16 25);
+    --destructive-foreground: oklch(0.17 0.02 25);
+    --success: oklch(0.76 0.14 150);
+    --success-foreground: oklch(0.17 0.02 150);
+    --warning: oklch(0.8 0.13 75);
+    --border: oklch(0.32 0.01 262);
+    --input: oklch(0.62 0 0);
+    --ring: oklch(0.74 0.13 262);
+    --chart-booked: oklch(0.74 0.13 262);
+    --chart-completed: oklch(0.76 0.14 150);
+    --chart-cancelled: oklch(0.7 0.02 262);
+    --chart-no-show: oklch(0.79 0.13 55);
+  }
+}
+
+@theme inline {
+  /* Other languages: CJK text (such as a name) falls back by system language. */
+  --font-sans: var(--font-latin), sans-serif;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-canvas: var(--canvas);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    /* Keep centred pages stable when route content gains or loses height. */
+    overflow-y: scroll;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+  [data-ui-surface] {
+    font-size: var(--text-base);
+    line-height: 1.5;
+  }
+  [data-ui-surface='customer'] {
+    --spacing: 0.28125rem;
+    --text-xs: 0.84375rem;
+    --text-sm: 1rem;
+    --text-base: 1.125rem;
+    --text-lg: 1.265625rem;
+    --text-xl: 1.40625rem;
+    --text-2xl: 1.6875rem;
+    --text-3xl: 2.109375rem;
+    --text-4xl: 2.53125rem;
+    --control-height: 3.375rem;
+    --control-small: 2.8125rem;
+    --control-large: 3.9375rem;
+    --page-gap: 1.5rem;
+    --form-gap: 1.40625rem;
+    --card-gap: 1.40625rem;
+    --card-padding-inline: 1.125rem;
+    --card-padding-block: 1.40625rem;
+    --dialog-width: 36rem;
+    line-height: 1.6;
+  }
+  [data-slot='field'] {
+    scroll-margin-block: 7rem 2rem;
+  }
+  [data-slot='dialog-content'],
+  [data-slot='alert-dialog-content'] {
+    --dialog-inline-inset: max(1rem, env(safe-area-inset-left), env(safe-area-inset-right));
+    --dialog-block-inset: max(1rem, env(safe-area-inset-top), env(safe-area-inset-bottom));
+    scroll-padding-block: var(--dialog-padding) 8rem;
+  }
+  /* The root keeps its scrollbar during Radix's body scroll lock. Avoid
+     compensating for that same gutter a second time; keep the lock itself. */
+  html body[data-scroll-locked] {
+    margin-right: 0 !important;
+  }
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+  input,
+  textarea {
+    caret-color: var(--primary);
+  }
+  input[type='number'],
+  time {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Each CJK language with its own region's fonts first (Apple, Windows,
+     then Noto / Source Han on Linux; Android picks by lang). :lang() also
+     matches nested elements with their own lang, such as the language
+     switcher's options. */
+  :lang(zh-Hans) {
+    font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', 'Noto Sans SC', 'Source Han Sans SC',
+      var(--font-latin), sans-serif;
+  }
+  :lang(zh-Hant) {
+    font-family: 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans CJK TC', 'Noto Sans TC', 'Source Han Sans TC',
+      var(--font-latin), sans-serif;
+  }
+  :lang(ja) {
+    font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', Meiryo, 'Noto Sans CJK JP',
+      'Noto Sans JP', var(--font-latin), sans-serif;
+    /* Break Japanese at phrase boundaries where supported (Chrome 119+);
+       other browsers keep their default line breaking. */
+    word-break: auto-phrase;
+  }
+  h1 {
+    @apply text-2xl font-bold leading-tight;
+  }
+  h2 {
+    @apply text-xl font-semibold leading-snug;
+  }
+  h3 {
+    @apply text-lg font-semibold leading-snug;
+  }
+  /* Even out heading lines so a last word or character is not left alone. */
+  h1,
+  h2 {
+    text-wrap: balance;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+}
+
+@media (min-width: 40rem) {
+  :root {
+    --card-padding-inline: 1.25rem;
+  }
+  [data-ui-surface='customer'] {
+    --card-padding-inline: 1.6875rem;
+    --card-padding-block: 1.6875rem;
+  }
+}
+
+@media (pointer: coarse) {
+  :root {
+    --control-small: 2.75rem;
+  }
+}
+
+/* Labels, controls and errors share tracks, including multiline translations.
+   Ordinary grid keeps the existing Safari baseline; DOM order stays intact. */
+.control-row {
+  display: grid;
+  gap: 1rem;
+}
+@container form (min-width: 34rem) {
+  .control-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    grid-template-rows: auto auto auto;
+    column-gap: 1rem;
+    row-gap: 0.5rem;
+    align-items: start;
+  }
+  .control-row > [data-slot='field'] { display: contents; }
+  .control-row > [data-slot='field'] > * { margin: 0; min-width: 0; }
+  .control-row > [data-slot='field']:nth-child(1) > * { grid-column: 1; }
+  .control-row > [data-slot='field']:nth-child(2) > * { grid-column: 2; }
+  .control-row [data-slot='field-label'] { grid-row: 1; }
+  .control-row [data-slot='field-control'] { grid-row: 2; }
+  .control-row [data-slot='field-support'] { grid-row: 3; }
+  .control-row > button { grid-column: 3; grid-row: 2; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

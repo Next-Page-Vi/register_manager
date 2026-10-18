@@ -1,0 +1,10 @@
+# Optional continuous backup with Litestream (https://litestream.io).
+# Run `litestream replicate -config deploy/litestream.yml` next to the server.
+# Restore: stop the server, `litestream restore -o /data/register_manager.db <replica-url>`, start it again.
+dbs:
+  - path: /data/register_manager.db
+    replicas:
+      - type: s3
+        bucket: my-backup-bucket
+        path: register_manager
+        region: eu-west-1

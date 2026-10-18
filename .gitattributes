@@ -1,0 +1,5 @@
+# Keep LF line endings in every checkout (gofmt and the generated files
+# expect them), regardless of the contributor's core.autocrlf setting.
+* text=auto eol=lf
+*.png binary
+*.ico binary

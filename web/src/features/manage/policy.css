@@ -1,0 +1,62 @@
+/* Keep each field in DOM order while its parts share the row's grid tracks.
+   Ordinary CSS Grid supports the project's existing browser baseline. */
+.policy-fields {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 48rem) {
+  .policy-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1.25rem;
+    row-gap: 0.5rem;
+  }
+
+  .policy-field {
+    --field-column: var(--column-two);
+    --field-row: var(--row-two);
+    --field-group-gap: var(--group-gap-two);
+  }
+
+  .policy-field,
+  .policy-field-body {
+    display: contents;
+  }
+
+  .policy-field-body > *,
+  .policy-field > .policy-unlimited {
+    grid-column: var(--field-column);
+    min-width: 0;
+    margin-block: 0;
+  }
+
+  .policy-field-body > [data-slot='field-label'] {
+    grid-row: var(--field-row);
+    padding-block-start: var(--field-group-gap);
+  }
+
+  .policy-field-body > [data-slot='field-control'] {
+    grid-row: calc(var(--field-row) + 1);
+  }
+
+  .policy-field-body > [data-slot='field-support'] {
+    grid-row: calc(var(--field-row) + 2);
+  }
+
+  .policy-field > .policy-unlimited {
+    grid-row: calc(var(--field-row) + 3);
+    align-self: start;
+  }
+}
+
+@media (min-width: 80rem) {
+  .policy-fields[data-columns='3'] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .policy-fields[data-columns='3'] > .policy-field {
+    --field-column: var(--column-three);
+    --field-row: var(--row-three);
+    --field-group-gap: var(--group-gap-three);
+  }
+}
