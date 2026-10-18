@@ -88,7 +88,10 @@ test('customer text and controls retain their size across portal dialogs', { tag
     await expect(dialog).toHaveAttribute('data-ui-surface', kind)
     expect(await fontSize(dialog)).toBe(kind === 'staff' ? 16 : 18)
     const button = dialog.getByRole('button', { name: 'English', exact: true })
-    expect((await rect(button)).height).toBeGreaterThanOrEqual(kind === 'staff' ? 44 : 54)
+    await expect.poll(
+      async () => (await rect(button)).height,
+      { timeout: 5_000 },
+    ).toBeGreaterThanOrEqual(kind === 'staff' ? 44 : 54)
     await page.keyboard.press('Escape')
   }
   await page.getByRole('button', { name: 'Cancel this appointment', exact: true }).first().click()
