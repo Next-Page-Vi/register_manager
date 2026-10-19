@@ -145,6 +145,7 @@ CREATE TABLE appointments (
 ) STRICT;
 
 CREATE INDEX appointments_instance_start ON appointments (instance_id, starts_at);
+CREATE INDEX appointments_instance_created ON appointments (instance_id, created_at);
 CREATE INDEX appointments_customer_start ON appointments (instance_id, customer_id, starts_at);
 CREATE INDEX appointments_occupying ON appointments (instance_id, ends_at) WHERE status <> 'cancelled';
 
