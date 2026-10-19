@@ -181,7 +181,7 @@ pnpm -C web test:e2e --project=iphone --project=layout-iphone-small
 | 推送内容 | 镜像标签 |
 | --- | --- |
 | `main` 分支 | `edge`、`sha-完整提交哈希` |
-| `v0.1.0` 等无预发布后缀的版本标签 | 对应版本号、`latest`、`sha-完整提交哈希` |
+| `v0.1.1` 等无预发布后缀的版本标签 | 对应版本号、`latest`、`sha-完整提交哈希` |
 | `v0.2.0-rc.1` 等预发布版本标签 | 对应版本号、`sha-完整提交哈希`，不更新 `latest` |
 
 首次发布使用 `v0.1.0`。后续修复递增补丁号，新增功能递增次版本号；在 `0.x` 阶段，破坏性变更也递增次版本号，并在发布说明中写明迁移要求。版本标签发布后不要移动或覆盖，修复使用新版本。
@@ -189,8 +189,8 @@ pnpm -C web test:e2e --project=iphone --project=layout-iphone-small
 发布前，在与公开仓库 `main` 一致的干净工作区中，将 `web/package.json` 的版本与目标版本对齐，并同步 README 中英文 Compose、`deploy/compose.yaml`、`deploy/.env.example` 和运维指南的默认版本。推送这些改动后，从该提交创建并推送版本标签，例如：
 
 ```sh
-git tag -a v0.1.0 -m "Release v0.1.0"
-git push origin refs/tags/v0.1.0
+git tag -a v0.1.1 -m "Release v0.1.1"
+git push origin refs/tags/v0.1.1
 ```
 
 等待该标签的 CI 和镜像发布成功，再创建对应的 GitHub Release。Git 标签中的预发布后缀决定是否更新 `latest`，GitHub Release 的 **Pre-release** 选项不控制镜像标签。版本默认值随发布改动提交，在标签构建成功前，新版本镜像还不可拉取。
@@ -390,7 +390,7 @@ Each push produces these image tags:
 | Push | Image tags |
 | --- | --- |
 | `main` branch | `edge`, `sha-full_commit_hash` |
-| Version without a pre-release suffix, such as `v0.1.0` | Full version, `latest`, `sha-full_commit_hash` |
+| Version without a pre-release suffix, such as `v0.1.1` | Full version, `latest`, `sha-full_commit_hash` |
 | Pre-release tag, such as `v0.2.0-rc.1` | Full version, `sha-full_commit_hash`; does not update `latest` |
 
 Use `v0.1.0` for the first release. Increment the patch number for fixes and the minor number for new features. During `0.x` development, increment the minor number for breaking changes too, and document migration requirements. Never move or overwrite a published version tag; publish fixes as new versions.
@@ -398,8 +398,8 @@ Use `v0.1.0` for the first release. Increment the patch number for fixes and the
 Prepare releases in a clean checkout matching the public repository's `main` branch. Align `web/package.json` with the target version. Update the default version in both README Compose examples, `deploy/compose.yaml`, `deploy/.env.example`, and the operations guide. Push those changes, then create and push a version tag on that commit, for example:
 
 ```sh
-git tag -a v0.1.0 -m "Release v0.1.0"
-git push origin refs/tags/v0.1.0
+git tag -a v0.1.1 -m "Release v0.1.1"
+git push origin refs/tags/v0.1.1
 ```
 
 Wait for the tag's CI and image publication to succeed, then create its GitHub Release. The Git tag's pre-release suffix controls whether `latest` updates; the GitHub Release **Pre-release** checkbox does not. Default versions change in the release commit, but the new image cannot be pulled until its tag build succeeds.

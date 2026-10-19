@@ -8,7 +8,7 @@
 #   docker compose logs app   # 初始管理员密码 / Initial admin password
 services:
   app:
-    image: ${RM_IMAGE:-ghcr.io/next-page-vi/register_manager:v0.1.0}
+    image: ${RM_IMAGE:-ghcr.io/next-page-vi/register_manager:v0.1.1}
     restart: unless-stopped
     ports:
       - "127.0.0.1:8080:8080"

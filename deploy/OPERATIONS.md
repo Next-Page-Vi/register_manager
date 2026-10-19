@@ -8,13 +8,13 @@
 
 ### 配置容器
 
-Compose 默认固定到 `ghcr.io/next-page-vi/register_manager:v0.1.0`，无需 `.env`。覆盖镜像时，在 `compose.yaml` 所在目录创建 `.env` 并设置 `RM_IMAGE`；仓库的 `.env.example` 可作为模板。在同一服务器移动部署文件时保留目录名 `deploy`：Compose 根据项目名识别已有数据卷。
+Compose 默认固定到 `ghcr.io/next-page-vi/register_manager:v0.1.1`，无需 `.env`。覆盖镜像时，在 `compose.yaml` 所在目录创建 `.env` 并设置 `RM_IMAGE`；仓库的 `.env.example` 可作为模板。在同一服务器移动部署文件时保留目录名 `deploy`：Compose 根据项目名识别已有数据卷。
 
 应用配置添加到 [`compose.yaml`](compose.yaml) 的 `environment` 中；仅写入 `.env` 不会传入容器。
 
 | 变量 | 部署默认值 | 用途 |
 | --- | --- | --- |
-| `RM_IMAGE` | `ghcr.io/next-page-vi/register_manager:v0.1.0` | 可选覆盖 Compose 使用的镜像地址 |
+| `RM_IMAGE` | `ghcr.io/next-page-vi/register_manager:v0.1.1` | 可选覆盖 Compose 使用的镜像地址 |
 | `RM_DB_PATH` | `/data/register_manager.db` | 持久化卷中的 SQLite 数据库 |
 | `RM_LISTEN` | `:8080` | 容器内 HTTP 监听地址 |
 | `RM_TRUSTED_PROXY_HEADER` | `X-Forwarded-For` | 限速使用的客户端地址头 |
@@ -147,7 +147,7 @@ docker compose up -d
 
 | 标签 | 用途 |
 | --- | --- |
-| `v0.1.0` 等完整版本号 | 正式部署使用，升级时明确选择目标版本 |
+| `v0.1.1` 等完整版本号 | 正式部署使用，升级时明确选择目标版本 |
 | `latest` | 跟随最近一次不含预发布后缀的版本发布 |
 | `edge` | 跟随 `main` 的成功构建，用于开发验证 |
 | `sha-完整提交哈希` | 定位具体提交的构建，排查问题时使用 |
@@ -166,13 +166,13 @@ Use this guide to configure, update, and maintain your Docker Compose deployment
 
 ### Configure the container
 
-Compose pins `ghcr.io/next-page-vi/register_manager:v0.1.0` by default, without an `.env` file. To override the image, create `.env` beside `compose.yaml` and set `RM_IMAGE`; the repository's `.env.example` is an optional template. Keep the directory name `deploy` when moving deployment files on the same server: Compose uses its project name to identify the existing data volume.
+Compose pins `ghcr.io/next-page-vi/register_manager:v0.1.1` by default, without an `.env` file. To override the image, create `.env` beside `compose.yaml` and set `RM_IMAGE`; the repository's `.env.example` is an optional template. Keep the directory name `deploy` when moving deployment files on the same server: Compose uses its project name to identify the existing data volume.
 
 Add application settings to the `environment` section of [`compose.yaml`](compose.yaml). Adding them to `.env` alone does not pass them into the container.
 
 | Variable | Deployment default | Purpose |
 | --- | --- | --- |
-| `RM_IMAGE` | `ghcr.io/next-page-vi/register_manager:v0.1.0` | Optional override for the image address used by Compose |
+| `RM_IMAGE` | `ghcr.io/next-page-vi/register_manager:v0.1.1` | Optional override for the image address used by Compose |
 | `RM_DB_PATH` | `/data/register_manager.db` | SQLite database inside the persistent volume |
 | `RM_LISTEN` | `:8080` | HTTP listen address inside the container |
 | `RM_TRUSTED_PROXY_HEADER` | `X-Forwarded-For` | Client-address header used for rate limiting |
@@ -305,7 +305,7 @@ Image tags identify these builds:
 
 | Tag | Purpose |
 | --- | --- |
-| Full versions such as `v0.1.0` | Production deployments with an explicit upgrade target |
+| Full versions such as `v0.1.1` | Production deployments with an explicit upgrade target |
 | `latest` | Follows the most recent publication without a pre-release suffix |
 | `edge` | Follows successful `main` builds for development testing |
 | `sha-full_commit_hash` | Identifies a commit's build for troubleshooting |

@@ -28,7 +28,7 @@ cd deploy
 ```yaml
 services:
   app:
-    image: ${RM_IMAGE:-ghcr.io/next-page-vi/register_manager:v0.1.0}
+    image: ${RM_IMAGE:-ghcr.io/next-page-vi/register_manager:v0.1.1}
     restart: unless-stopped
     ports:
       - "127.0.0.1:8080:8080"
@@ -41,7 +41,7 @@ volumes:
   data:
 ```
 
-默认固定到公开的 `v0.1.0` 镜像，无需登录 GHCR 或创建 `.env`。拉取并启动：
+默认固定到公开的 `v0.1.1` 镜像，无需登录 GHCR 或创建 `.env`。拉取并启动：
 
 ```sh
 docker compose pull
@@ -90,7 +90,7 @@ Save this complete configuration as `compose.yaml`. It matches the repository's 
 ```yaml
 services:
   app:
-    image: ${RM_IMAGE:-ghcr.io/next-page-vi/register_manager:v0.1.0}
+    image: ${RM_IMAGE:-ghcr.io/next-page-vi/register_manager:v0.1.1}
     restart: unless-stopped
     ports:
       - "127.0.0.1:8080:8080"
@@ -103,7 +103,7 @@ volumes:
   data:
 ```
 
-The configuration pins the public `v0.1.0` image. You don't need a GHCR login or an `.env` file. Pull and start the image:
+The configuration pins the public `v0.1.1` image. You don't need a GHCR login or an `.env` file. Pull and start the image:
 
 ```sh
 docker compose pull
