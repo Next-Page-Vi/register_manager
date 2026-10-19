@@ -21,6 +21,10 @@ web/playwright-report/
 .env.*
 !.env.example
 
+# Local Codex project memory
+/AGENTS.md
+/agent.md
+
 # Local data and logs
 /data/
 *.log
