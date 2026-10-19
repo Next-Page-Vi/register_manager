@@ -8,7 +8,7 @@
 
 自托管预约系统：管理多个独立预约表，配置排班，审核客户，并通过个人链接预约。支持简体中文、繁体中文、英语和日语；单节点运行，数据保存在 SQLite 中。
 
-当前为预发布版本。旧开发数据库和 API 不保证兼容，升级前阅读[兼容边界](deploy/OPERATIONS.md#更新或固定镜像版本)。
+当前为 `0.x` 早期版本。旧开发数据库和 API 不保证兼容，升级前阅读[兼容边界](deploy/OPERATIONS.md#更新或固定镜像版本)。
 
 每个预约表只有一条服务时间线，不同预约表不共享操作员的时间占用。后台代约可绕过客户预约规则；产品范围和暂停行为见[使用边界](deploy/OPERATIONS.md#理解使用边界)。
 
@@ -28,7 +28,7 @@ cd deploy
 ```yaml
 services:
   app:
-    image: ${RM_IMAGE:-ghcr.io/next-page-vi/register_manager:latest}
+    image: ${RM_IMAGE:-ghcr.io/next-page-vi/register_manager:v0.1.0}
     restart: unless-stopped
     ports:
       - "127.0.0.1:8080:8080"
@@ -41,7 +41,7 @@ volumes:
   data:
 ```
 
-默认拉取公开的 `latest` 镜像，无需登录 GHCR 或创建 `.env`。拉取并启动：
+默认固定到公开的 `v0.1.0` 镜像，无需登录 GHCR 或创建 `.env`。拉取并启动：
 
 ```sh
 docker compose pull
@@ -49,13 +49,13 @@ docker compose up -d
 docker compose logs app
 ```
 
-需要固定版本时，在同一目录的 `.env` 中设置 `RM_IMAGE=ghcr.io/next-page-vi/register_manager:sha-完整提交哈希`，将“完整提交哈希”替换为已发布版本的实际哈希。`latest` 跟随 `main` 的成功构建，当前不代表稳定版本。
+其他版本见 [GitHub Releases](https://github.com/Next-Page-Vi/register_manager/releases)。`latest` 跟随不含 `rc`、`beta` 等后缀的版本发布；`edge` 跟随 `main` 的成功构建。正式部署建议固定 `vX.Y.Z` 标签。
 
 打开你的 HTTPS 域名下的 `/account/login`，使用账号 `admin` 和日志中的初始密码登录，立即修改密码。随后创建操作员和预约表，设置排班与预约规则，再开放预约。
 
 ### 更新与备份
 
-更新前阅读[兼容边界与版本固定方式](deploy/OPERATIONS.md#更新或固定镜像版本)，[备份数据库](deploy/OPERATIONS.md#备份数据库)，再在 `deploy/` 中执行：
+更新前阅读[发布说明](https://github.com/Next-Page-Vi/register_manager/releases)和[兼容边界](deploy/OPERATIONS.md#更新或固定镜像版本)，并[备份数据库](deploy/OPERATIONS.md#备份数据库)。在 `deploy/.env` 中设置 `RM_IMAGE=ghcr.io/next-page-vi/register_manager:vX.Y.Z`，将 `vX.Y.Z` 替换为已发布的目标版本，再在 `deploy/` 中执行：
 
 ```sh
 docker compose pull
@@ -70,7 +70,7 @@ docker compose up -d
 
 A self-hosted appointment system with independent calendars, working hours, customer approval, and personal booking links. It supports English, Japanese, Simplified Chinese, and Traditional Chinese. Run one server with a SQLite database.
 
-This is a pre-release. Older development databases and APIs are not guaranteed compatible. Read the [compatibility limits](deploy/OPERATIONS.md#update-or-pin-an-image) before upgrading.
+This project is in early `0.x` development. Older development databases and APIs are not guaranteed compatible. Read the [compatibility limits](deploy/OPERATIONS.md#update-or-pin-an-image) before upgrading.
 
 Each calendar has one service timeline. Calendars do not share an operator's occupied time. Staff bookings can bypass customer rules; see [usage limits](deploy/OPERATIONS.md#understand-usage-limits) for product scope and paused-calendar behavior.
 
@@ -90,7 +90,7 @@ Save this complete configuration as `compose.yaml`. It matches the repository's 
 ```yaml
 services:
   app:
-    image: ${RM_IMAGE:-ghcr.io/next-page-vi/register_manager:latest}
+    image: ${RM_IMAGE:-ghcr.io/next-page-vi/register_manager:v0.1.0}
     restart: unless-stopped
     ports:
       - "127.0.0.1:8080:8080"
@@ -103,7 +103,7 @@ volumes:
   data:
 ```
 
-The configuration uses the public `latest` image by default. You don't need a GHCR login or an `.env` file. Pull and start the image:
+The configuration pins the public `v0.1.0` image. You don't need a GHCR login or an `.env` file. Pull and start the image:
 
 ```sh
 docker compose pull
@@ -111,13 +111,13 @@ docker compose up -d
 docker compose logs app
 ```
 
-To pin a published version, create `.env` in the same directory and set `RM_IMAGE=ghcr.io/next-page-vi/register_manager:sha-full_commit_hash`, replacing `full_commit_hash` with that version's full commit hash. The `latest` tag follows successful `main` builds and currently does not identify a stable release.
+See [GitHub Releases](https://github.com/Next-Page-Vi/register_manager/releases) for other versions. The `latest` tag follows releases without suffixes such as `rc` or `beta`; `edge` follows successful `main` builds. Pin a `vX.Y.Z` tag for production deployments.
 
 Open `/account/login` on your HTTPS domain. Sign in as `admin` with the initial password from the logs and change it immediately. Create an operator and calendar, configure working hours and booking rules, then open booking.
 
 ### Update and back up
 
-Read the [compatibility limits and image-pinning instructions](deploy/OPERATIONS.md#update-or-pin-an-image), [back up the database](deploy/OPERATIONS.md#back-up-the-database), then run these commands from `deploy/`:
+Read the [release notes](https://github.com/Next-Page-Vi/register_manager/releases) and [compatibility limits](deploy/OPERATIONS.md#update-or-pin-an-image), then [back up the database](deploy/OPERATIONS.md#back-up-the-database). Set `RM_IMAGE=ghcr.io/next-page-vi/register_manager:vX.Y.Z` in `deploy/.env`, replacing `vX.Y.Z` with the published target version. Run these commands from `deploy/`:
 
 ```sh
 docker compose pull

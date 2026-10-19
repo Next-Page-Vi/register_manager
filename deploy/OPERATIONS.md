@@ -8,13 +8,13 @@
 
 ### 配置容器
 
-Compose 默认拉取 `ghcr.io/next-page-vi/register_manager:latest`，无需 `.env`。覆盖镜像时，在 `compose.yaml` 所在目录创建 `.env` 并设置 `RM_IMAGE`；仓库的 `.env.example` 可作为模板。在同一服务器移动部署文件时保留目录名 `deploy`：Compose 根据项目名识别已有数据卷。
+Compose 默认固定到 `ghcr.io/next-page-vi/register_manager:v0.1.0`，无需 `.env`。覆盖镜像时，在 `compose.yaml` 所在目录创建 `.env` 并设置 `RM_IMAGE`；仓库的 `.env.example` 可作为模板。在同一服务器移动部署文件时保留目录名 `deploy`：Compose 根据项目名识别已有数据卷。
 
 应用配置添加到 [`compose.yaml`](compose.yaml) 的 `environment` 中；仅写入 `.env` 不会传入容器。
 
 | 变量 | 部署默认值 | 用途 |
 | --- | --- | --- |
-| `RM_IMAGE` | `ghcr.io/next-page-vi/register_manager:latest` | 可选覆盖 Compose 使用的镜像地址 |
+| `RM_IMAGE` | `ghcr.io/next-page-vi/register_manager:v0.1.0` | 可选覆盖 Compose 使用的镜像地址 |
 | `RM_DB_PATH` | `/data/register_manager.db` | 持久化卷中的 SQLite 数据库 |
 | `RM_LISTEN` | `:8080` | 容器内 HTTP 监听地址 |
 | `RM_TRUSTED_PROXY_HEADER` | `X-Forwarded-For` | 限速使用的客户端地址头 |
@@ -130,20 +130,29 @@ docker compose up -d
 
 ### 更新或固定镜像版本
 
-当前为预发布版本，旧开发数据库和旧 API 不保证兼容；不能把更换镜像视为受支持的旧开发库升级。旧 64 MiB Argon2id 密码参数也不被接受，没有自动密码迁移。
+当前为 `0.x` 早期版本，旧开发数据库和旧 API 不保证兼容；不能把更换镜像视为受支持的旧开发库升级。旧 64 MiB Argon2id 密码参数也不被接受，没有自动密码迁移。
 
-全新部署使用新数据库卷。已有开发数据需要保留时，先保留原镜像和完整备份，在独立部署中验证；不要直接覆盖唯一副本或删除原卷。正式发布后，已发布的迁移只追加，具体升级兼容性以对应发布说明为准。
+全新部署使用新数据库卷。已有开发数据需要保留时，先保留原镜像和完整备份，在独立部署中验证；不要直接覆盖唯一副本或删除原卷。已发布的迁移只追加，具体升级兼容性以对应发布说明为准。
 
-先备份，再拉取并启动所选镜像：
+在 [GitHub Releases](https://github.com/Next-Page-Vi/register_manager/releases) 选择目标版本并阅读升级说明。先备份，再创建或更新 `compose.yaml` 所在目录的 `.env`，设置 `RM_IMAGE=ghcr.io/next-page-vi/register_manager:vX.Y.Z`，将 `vX.Y.Z` 替换为已发布的目标版本。拉取并启动所选镜像：
 
 ```sh
 docker compose pull
 docker compose up -d
 ```
 
-固定已发布版本时，在 `compose.yaml` 所在目录创建或更新 `.env`，将 `RM_IMAGE` 设置为 `ghcr.io/next-page-vi/register_manager:sha-完整提交哈希`，使用该版本的实际哈希，再执行相同命令。数据库结构发生变化时，旧镜像可能需要对应版本的数据库备份。
+默认配置已固定版本，仅执行 `pull` 不会升级到其他版本。数据库结构发生变化时，旧镜像可能需要对应版本的数据库备份。
 
-`:latest` 随 `main` 的成功构建更新，不表示稳定版本。需要可重复部署时固定 `:sha-` 标签，并保留该镜像对应的备份。
+镜像标签的含义如下：
+
+| 标签 | 用途 |
+| --- | --- |
+| `v0.1.0` 等完整版本号 | 正式部署使用，升级时明确选择目标版本 |
+| `latest` | 跟随最近一次不含预发布后缀的版本发布 |
+| `edge` | 跟随 `main` 的成功构建，用于开发验证 |
+| `sha-完整提交哈希` | 定位具体提交的构建，排查问题时使用 |
+
+如需锁定镜像内容，可将 `RM_IMAGE` 设置为 `ghcr.io/next-page-vi/register_manager@sha256:镜像摘要`，使用该版本在 GHCR 中的实际摘要。
 
 ### 理解统计数据
 
@@ -157,13 +166,13 @@ Use this guide to configure, update, and maintain your Docker Compose deployment
 
 ### Configure the container
 
-Compose pulls `ghcr.io/next-page-vi/register_manager:latest` by default, without an `.env` file. To override the image, create `.env` beside `compose.yaml` and set `RM_IMAGE`; the repository's `.env.example` is an optional template. Keep the directory name `deploy` when moving deployment files on the same server: Compose uses its project name to identify the existing data volume.
+Compose pins `ghcr.io/next-page-vi/register_manager:v0.1.0` by default, without an `.env` file. To override the image, create `.env` beside `compose.yaml` and set `RM_IMAGE`; the repository's `.env.example` is an optional template. Keep the directory name `deploy` when moving deployment files on the same server: Compose uses its project name to identify the existing data volume.
 
 Add application settings to the `environment` section of [`compose.yaml`](compose.yaml). Adding them to `.env` alone does not pass them into the container.
 
 | Variable | Deployment default | Purpose |
 | --- | --- | --- |
-| `RM_IMAGE` | `ghcr.io/next-page-vi/register_manager:latest` | Optional override for the image address used by Compose |
+| `RM_IMAGE` | `ghcr.io/next-page-vi/register_manager:v0.1.0` | Optional override for the image address used by Compose |
 | `RM_DB_PATH` | `/data/register_manager.db` | SQLite database inside the persistent volume |
 | `RM_LISTEN` | `:8080` | HTTP listen address inside the container |
 | `RM_TRUSTED_PROXY_HEADER` | `X-Forwarded-For` | Client-address header used for rate limiting |
@@ -279,20 +288,29 @@ The helper container mounts the same data volume. Check `docker compose ps` and 
 
 ### Update or pin an image
 
-This is a pre-release. Older development databases and APIs are not guaranteed compatible; changing the image is not a supported upgrade for those databases. The former 64 MiB Argon2id password profile is also unsupported, without automatic password migration.
+This project is in early `0.x` development. Older development databases and APIs are not guaranteed compatible; changing the image is not a supported upgrade for those databases. The former 64 MiB Argon2id password profile is also unsupported, without automatic password migration.
 
-Use a new database volume for a fresh deployment. To retain development data, keep the original image and a full backup, then validate a separate deployment. Do not overwrite the only copy or delete its volume. After formal release, published migrations are append-only; consult each release's upgrade notes for compatibility.
+Use a new database volume for a fresh deployment. To retain development data, keep the original image and a full backup, then validate a separate deployment. Do not overwrite the only copy or delete its volume. Published migrations are append-only; consult each release's upgrade notes for compatibility.
 
-Back up first, then pull and start the selected image:
+Choose a target version from [GitHub Releases](https://github.com/Next-Page-Vi/register_manager/releases) and read its upgrade notes. Back up the database, then create or update `.env` beside `compose.yaml`. Set `RM_IMAGE=ghcr.io/next-page-vi/register_manager:vX.Y.Z`, replacing `vX.Y.Z` with the published target version. Pull and start the selected image:
 
 ```sh
 docker compose pull
 docker compose up -d
 ```
 
-To pin a published version, create or update `.env` beside `compose.yaml` and set `RM_IMAGE=ghcr.io/next-page-vi/register_manager:sha-full_commit_hash`, replacing `full_commit_hash` with that version's full commit hash. Run the same commands. An older image may require its matching database backup if the schema changed.
+The default configuration pins a version, so `pull` alone does not upgrade to another release. An older image may require its matching database backup if the schema changed.
 
-`:latest` follows successful `main` builds and does not identify a stable release. Pin a `:sha-` tag for reproducible deployments and retain its matching backup.
+Image tags identify these builds:
+
+| Tag | Purpose |
+| --- | --- |
+| Full versions such as `v0.1.0` | Production deployments with an explicit upgrade target |
+| `latest` | Follows the most recent publication without a pre-release suffix |
+| `edge` | Follows successful `main` builds for development testing |
+| `sha-full_commit_hash` | Identifies a commit's build for troubleshooting |
+
+To pin the image content, set `RM_IMAGE=ghcr.io/next-page-vi/register_manager@sha256:image_digest`, replacing `image_digest` with that version's actual GHCR digest.
 
 ### Interpret statistics
 

@@ -99,7 +99,7 @@ pnpm -C web check:api
 pnpm -C web build
 ```
 
-[CI 工作流](.github/workflows/ci.yml) 还检查纯 Go 构建、Staticcheck、竞态、30 秒模糊测试、依赖漏洞和日常浏览器测试。只有 `main` 分支推送且检查成功后才发布 Docker 镜像。
+[CI 工作流](.github/workflows/ci.yml) 还检查纯 Go 构建、Staticcheck、竞态、30 秒模糊测试、依赖漏洞和日常浏览器测试。`main` 分支或版本标签推送且检查成功后才发布 Docker 镜像；拉取请求仅运行检查。
 
 其他检查与生成命令：
 
@@ -172,9 +172,28 @@ pnpm -C web test:e2e --project=iphone --project=layout-iphone-small
 
 ### 发布部署镜像
 
-维护者通过 [GitHub Actions](.github/workflows/ci.yml) 发布镜像。推送到 `main` 后，检查和测试成功才会运行 `docker` 任务。工作流通过 [Dockerfile](Dockerfile) 构建 Linux AMD64 镜像并推送到 GitHub Container Registry（GHCR）；拉取请求不发布镜像。
+维护者通过 [GitHub Actions](.github/workflows/ci.yml) 发布镜像。推送到 `main` 或推送 `v*.*.*` 版本标签后，检查和测试成功才会运行 `docker` 任务。工作流通过 [Dockerfile](Dockerfile) 构建 Linux AMD64 镜像并推送到 GitHub Container Registry（GHCR）；拉取请求不发布镜像。
 
-项目仓库为 `Next-Page-Vi/register_manager`，镜像为 `ghcr.io/next-page-vi/register_manager`。工作流根据小写仓库路径生成镜像名。每次发布更新 `latest`，并添加 `sha-` 加完整提交哈希的标签。`latest` 跟随主分支，当前不代表稳定版本。发布使用自动提供的 `GITHUB_TOKEN` 和 `packages: write` 权限，无需手动配置镜像仓库密钥。
+项目仓库为 `Next-Page-Vi/register_manager`，镜像为 `ghcr.io/next-page-vi/register_manager`。工作流根据小写仓库路径生成镜像名，并通过 Docker Metadata Action 生成版本标签和 OCI 标签。发布使用自动提供的 `GITHUB_TOKEN` 和 `packages: write` 权限，无需手动配置镜像仓库密钥。
+
+各类推送生成的镜像标签如下：
+
+| 推送内容 | 镜像标签 |
+| --- | --- |
+| `main` 分支 | `edge`、`sha-完整提交哈希` |
+| `v0.1.0` 等无预发布后缀的版本标签 | 对应版本号、`latest`、`sha-完整提交哈希` |
+| `v0.2.0-rc.1` 等预发布版本标签 | 对应版本号、`sha-完整提交哈希`，不更新 `latest` |
+
+首次发布使用 `v0.1.0`。后续修复递增补丁号，新增功能递增次版本号；在 `0.x` 阶段，破坏性变更也递增次版本号，并在发布说明中写明迁移要求。版本标签发布后不要移动或覆盖，修复使用新版本。
+
+发布前，在与公开仓库 `main` 一致的干净工作区中，将 `web/package.json` 的版本与目标版本对齐，并同步 README 中英文 Compose、`deploy/compose.yaml`、`deploy/.env.example` 和运维指南的默认版本。推送这些改动后，从该提交创建并推送版本标签，例如：
+
+```sh
+git tag -a v0.1.0 -m "Release v0.1.0"
+git push origin refs/tags/v0.1.0
+```
+
+等待该标签的 CI 和镜像发布成功，再创建对应的 GitHub Release。Git 标签中的预发布后缀决定是否更新 `latest`，GitHub Release 的 **Pre-release** 选项不控制镜像标签。版本默认值随发布改动提交，在标签构建成功前，新版本镜像还不可拉取。
 
 Docker 构建自动收集 Go 依赖许可、Go 工具链许可和 Vite 生成的前端依赖许可，与本项目的 LICENSE 一起放入 `/usr/share/licenses/register_manager/`。依赖更新时检查构建结果和[第三方声明](THIRD_PARTY_NOTICES.md)，不要只更新根目录许可证。
 
@@ -184,7 +203,7 @@ Docker 构建自动收集 Go 依赖许可、Go 工具链许可和 Vite 生成的
 2. 首次发布镜像后，在 **Package settings** 中将镜像包可见性设为 **Public**。
 3. 确认 README 的 Compose 示例与部署配置一致；不设置 `RM_IMAGE`，使用未登录的 Docker 客户端按 README 拉取镜像。
 4. 用空数据卷按 README 和 Nginx 示例完成 HTTPS 部署，验证登录、客户链接和日志脱敏；再使用虚构数据演练备份、恢复和固定版本更新。
-5. 检查镜像内许可文件，并在 GitHub Release 中记录对应 `sha-` 标签、数据库兼容性、破坏性变更和验证结果。预发布版本标记为 **Pre-release**；尚未完成的外部验证明确列为待办。
+5. 检查镜像内许可文件，并在 GitHub Release 中记录版本号、对应 `sha-` 标签、镜像摘要、数据库兼容性、破坏性变更和验证结果。预发布版本标记为 **Pre-release**；尚未完成的外部验证明确列为待办。
 
 镜像包权限见 [GitHub Container registry 文档](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry)。发布凭证和镜像仓库管理说明保留在维护者文档中。
 
@@ -289,7 +308,7 @@ pnpm -C web check:api
 pnpm -C web build
 ```
 
-The [CI workflow](.github/workflows/ci.yml) also checks a pure-Go build, Staticcheck, the race detector, a 30-second fuzz run, dependency vulnerabilities, and the daily browser suite. Only a successful `main` push publishes a Docker image.
+The [CI workflow](.github/workflows/ci.yml) also checks a pure-Go build, Staticcheck, the race detector, a 30-second fuzz run, dependency vulnerabilities, and the daily browser suite. A `main` or version-tag push publishes a Docker image after the checks pass; pull requests only run checks.
 
 Additional checks and generation commands:
 
@@ -362,9 +381,28 @@ Write all project documentation in Simplified Chinese and English, keeping both 
 
 ### Publish the deployment image
 
-Maintainers publish the image through [GitHub Actions](.github/workflows/ci.yml). Push to `main` and wait for the `docker` job to succeed after the checks and tests. The workflow builds the [Dockerfile](Dockerfile) for Linux AMD64 and pushes to GitHub Container Registry (GHCR); pull requests do not publish images.
+Maintainers publish the image through [GitHub Actions](.github/workflows/ci.yml). Push to `main` or push a `v*.*.*` version tag, then wait for the `docker` job after checks and tests pass. The workflow builds the [Dockerfile](Dockerfile) for Linux AMD64 and pushes to GitHub Container Registry (GHCR); pull requests do not publish images.
 
-The repository is `Next-Page-Vi/register_manager`, and its image is `ghcr.io/next-page-vi/register_manager`. The workflow derives the image name from the lowercase repository path. Each publication updates `latest` and adds a `sha-` tag followed by the full commit hash. `latest` follows the main branch and currently does not identify a stable release. Publishing uses the automatic `GITHUB_TOKEN` with `packages: write`, without a manually configured registry secret.
+The repository is `Next-Page-Vi/register_manager`, and its image is `ghcr.io/next-page-vi/register_manager`. The workflow derives the image name from the lowercase repository path. Docker Metadata Action generates version tags and OCI labels. Publishing uses the automatic `GITHUB_TOKEN` with `packages: write`, without a manually configured registry secret.
+
+Each push produces these image tags:
+
+| Push | Image tags |
+| --- | --- |
+| `main` branch | `edge`, `sha-full_commit_hash` |
+| Version without a pre-release suffix, such as `v0.1.0` | Full version, `latest`, `sha-full_commit_hash` |
+| Pre-release tag, such as `v0.2.0-rc.1` | Full version, `sha-full_commit_hash`; does not update `latest` |
+
+Use `v0.1.0` for the first release. Increment the patch number for fixes and the minor number for new features. During `0.x` development, increment the minor number for breaking changes too, and document migration requirements. Never move or overwrite a published version tag; publish fixes as new versions.
+
+Prepare releases in a clean checkout matching the public repository's `main` branch. Align `web/package.json` with the target version. Update the default version in both README Compose examples, `deploy/compose.yaml`, `deploy/.env.example`, and the operations guide. Push those changes, then create and push a version tag on that commit, for example:
+
+```sh
+git tag -a v0.1.0 -m "Release v0.1.0"
+git push origin refs/tags/v0.1.0
+```
+
+Wait for the tag's CI and image publication to succeed, then create its GitHub Release. The Git tag's pre-release suffix controls whether `latest` updates; the GitHub Release **Pre-release** checkbox does not. Default versions change in the release commit, but the new image cannot be pulled until its tag build succeeds.
 
 Docker builds collect Go dependency licenses, the Go toolchain license, and Vite-generated frontend dependency licenses. These accompany the project LICENSE under `/usr/share/licenses/register_manager/`. When updating dependencies, review the build output and [third-party notices](THIRD_PARTY_NOTICES.md), not only the root license.
 
@@ -374,7 +412,7 @@ Before sharing a public release:
 2. After the first image publication, set its visibility to **Public** in **Package settings**.
 3. Confirm the README's Compose examples match the deployment configuration. Leave `RM_IMAGE` unset and follow the README to pull the image with an unauthenticated Docker client.
 4. Follow the README and Nginx example with an empty volume. Verify HTTPS, login, customer links, and credential-safe logs, then exercise backup, restore, and pinned-image updates with fictional data.
-5. Inspect license files inside the image. Record its `sha-` tag, database compatibility, breaking changes, and validation results in the GitHub Release. Mark pre-release versions as **Pre-release** and list unfinished external checks as pending.
+5. Inspect license files inside the image. Record its version, `sha-` tag, image digest, database compatibility, breaking changes, and validation results in the GitHub Release. Mark pre-release versions as **Pre-release** and list unfinished external checks as pending.
 
 See [GitHub's Container registry documentation](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry) for package permissions. Keep publishing credentials and registry administration out of user deployment instructions.
 
